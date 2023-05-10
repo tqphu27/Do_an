@@ -125,7 +125,7 @@ def init_args():
     # params for prediction engine
 
     # params for text detector
-    parser.add_argument("--image_dir", type=str, default= '/home/tima/Do_an/api/')
+    parser.add_argument("--image_dir", type=str, default= '/home/tima/Do_an/api/database/image/')
     parser.add_argument("--det_algorithm", type=str, default='DB')
     parser.add_argument("--det_model_dir", type=str, default='/home/tima/Do_an/api/models/oonx/model_det.onnx')
     parser.add_argument("--det_limit_side_len", type=float, default=960)
@@ -182,7 +182,7 @@ def init_args():
     
     parser.add_argument('-ckpt', '--checkpoint', default='/home/tima/Do_an/api/models/model_best.pth', type=str,
                       help='path to load checkpoint (default: None)')
-    parser.add_argument('--bt', '--boxes_transcripts', default='/home/tima/Do_an/infer/', type=str,
+    parser.add_argument('--bt', '--boxes_transcripts', default='/home/tima/Do_an/api/database/tsv_file/', type=str,
                       help='ocr results folder including boxes and transcripts (default: None)')
     parser.add_argument('--impt', '--images_path', default='/home/tima/Do_an/api/', type=str,
                       help='images folder path (default: None)')

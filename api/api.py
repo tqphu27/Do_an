@@ -13,6 +13,7 @@ import base64
 from preprocess.scan import scan_img
 from typing import List
 import uvicorn
+from pydantic import BaseModel
 
 from predict import TextSystem, predict_pick
 from utils import parse_args
@@ -86,14 +87,37 @@ def predict_kie(image):
     return dict
 
 @app.post("/api/predict")
-async def predict(files: List[UploadFile] = File(...)):
+async def predict(file: UploadFile = File(...)):
     start = time.time()
-    for file in files:
-        img = await file_to_image(file)
-        img = scan_img(img)
-        cv2.imwrite('/home/tima/Do_an/api/a.jpg',img)
+    img = await file_to_image(file)
+    img = scan_img(img)
+    cv2.imwrite('/home/tima/Do_an/api/a.jpg',img)
 
-        dict = predict_kie(img)
+    dict = predict_kie(img)
+        
+
+    print(time.time() - start)
+    
+    return JSONResponse(dict)
+
+class ImageStr(BaseModel):
+    image: str
+
+async def url_to_image(img_str):
+    import requests
+    from io import BytesIO
+    response = requests.get(img_str)
+    img = Image.open(BytesIO(response.content)) 
+    img = np.array(img)
+    return img
+
+@app.post("/api/predict_url")
+async def predict(image: ImageStr):
+    start = time.time()
+    img = await url_to_image(image.image)
+    img = scan_img(img)
+    cv2.imwrite('/home/tima/Do_an/api/a.jpg',img)
+    dict = predict_kie(img)
     print(time.time() - start)
     
     return JSONResponse(dict)
@@ -101,4 +125,4 @@ async def predict(files: List[UploadFile] = File(...)):
 
         
 if __name__ == '__main__':
-    uvicorn.run('api:app', port=15000)
+    uvicorn.run('api:app', port=15001)
