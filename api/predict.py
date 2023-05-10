@@ -254,16 +254,45 @@ class TextSystem(object):
                 img_crop_list[bno])
         self.crop_image_res_index += bbox_num
 
+    
+    def find_rotation_score(self, img):
+        
+        score = []
+        for i in range(4):
+            ori_im = img.copy()
+            dt_boxes, elapse = self.text_detector(img)
+            if dt_boxes is None:
+                return None, None
+            print(len(dt_boxes))
+            tmp_box = copy.deepcopy(dt_boxes[20])
+            # tmp_box_1 = copy.deepcopy(dt_boxes[1])
+            img_crop = get_rotate_crop_image(ori_im, tmp_box)
+            # img_crop_1 = get_rotate_crop_image(ori_im, tmp_box_1)
+            res_0, elapse = self.text_recognizer([img_crop])
+            # res_1, elapse = self.text_recognizer([img_crop_1])
+            a, b = res_0[0]
+            # c, d = res_1[0]
+            print(a,b)
+            score.append(b)
+            
+            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
+        
+        return np.argmax(score) 
+    
     def inference(self, img, cls=True):
+        orient = self.find_rotation_score(img)
+        print(orient)
+        for i in range(orient):
+            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         ori_im = img.copy()
         dt_boxes, elapse = self.text_detector(img)
 
         if dt_boxes is None:
-            return None, None
+            return None, None  
         img_crop_list = []
 
-        dt_boxes = sorted_boxes(dt_boxes)
-
+        dt_boxes = sorted_boxes(dt_boxes)     
         for bno in range(len(dt_boxes)):
             tmp_box = copy.deepcopy(dt_boxes[bno])
             img_crop = get_rotate_crop_image(ori_im, tmp_box)
